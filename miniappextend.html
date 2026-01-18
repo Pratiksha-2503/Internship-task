@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini App - Create Account</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        body {
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            padding: 45px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+        }
+
+        h2 { 
+            text-align: center; 
+            font-size: 28px; 
+            color: #2563eb; 
+            margin-bottom: 35px; 
+            font-weight: 700;
+        }
+
+        .input-box { margin-bottom: 18px; }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        input:focus { border-color: #3b82f6; }
+        input:disabled { background-color: #fdfdfd; border-color: transparent; color: #1e293b; font-weight: 500; cursor: default; }
+
+        .row { display: flex; gap: 15px; }
+        .row .input-box { flex: 1; }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background-color: #1a273c; 
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #3b82f6;
+            cursor: pointer;
+            display: block;
+            text-decoration: none;
+        }
+
+        .hidden { display: none; }
+
+       .modal-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 380px;
+        }
+
+        .confirm-row { display: flex; align-items: center; gap: 10px; margin: 15px 0; font-size: 13px; color: #475569; }
+        .confirm-row input { width: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="regPage">
+            <h2>Create Account</h2>
+            
+            <div class="input-box"><label>Full Name</label><input type="text" id="rName"></div>
+            
+            <div class="row">
+                <div class="input-box"><label>Age</label><input type="number" id="rAge"></div>
+                <div class="input-box"><label>Pincode</label><input type="number" id="rPin"></div>
+            </div>
+
+            <div class="input-box"><label>Phone Number</label><input type="text" id="rPhone"></div>
+            <div class="input-box"><label>Email Address</label><input type="email" id="rEmail"></div>
+            <div class="input-box"><label>Address</label><textarea id="rAddr" rows="3"></textarea></div>
+            <div class="input-box"><label>Password</label><input type="password" id="rPass"></div>
+            <div class="input-box"><label>Confirm Password</label><input type="password" id="rConfirm"></div>
+
+            <button class="btn" onclick="handleRegister()">Sign Up</button>
+            <div class="link" onclick="showPage('loginPage')">Already registered? Login</div>
+        </div>
+
+        <div id="loginPage" class="hidden">
+            <h2>Login</h2>
+            <div class="input-box"><label>Email Address</label><input type="email" id="lEmail"></div>
+            <div class="input-box"><label>Password</label><input type="password" id="lPass"></div>
+            <button class="btn" onclick="handleLogin()">Login</button>
+            <div class="link" onclick="showPage('regPage')">New user? Register</div>
+        </div>
+
+        <div id="profilePage" class="hidden">
+            <h2>User Profile</h2>
+            <div id="profileFields">
+                <div class="input-box"><label>Full Name</label><input type="text" id="pName" disabled></div>
+                <div class="row">
+                    <div class="input-box"><label>Age</label><input type="number" id="pAge" disabled></div>
+                    <div class="input-box"><label>Pincode</label><input type="number" id="pPin" disabled></div>
+                </div>
+                <div class="input-box"><label>Phone Number</label><input type="text" id="pPhone" disabled></div>
+                <div class="input-box"><label>Address</label><textarea id="pAddr" rows="2" disabled></textarea></div>
+            </div>
+
+            <button id="editBtn" class="btn" onclick="toggleEdit(true)">Update Profile</button>
+            <button id="saveBtn" class="btn hidden" onclick="saveData()">Update the Changes</button>
+            <button class="btn" style="background:#64748b" onclick="openModal()">Change Password</button>
+            <button class="btn" style="background:#ef4444" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div id="passModal" class="modal-bg">
+        <div class="modal-card">
+            <h3>Change Password</h3>
+            <br>
+            <div class="input-box"><label>New Password</label><input type="password" id="mPass"></div>
+            <div class="input-box"><label>Confirm Password</label><input type="password" id="mConfirm"></div>
+            <div class="confirm-row">
+                <input type="checkbox" id="mCheck">
+                <span>I confirm to change my password</span>
+            </div>
+            <button class="btn" onclick="submitPassword()">Update Password</button>
+            <button class="btn" style="background:#cbd5e1; color:#1e293b" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        window.onload = () => {
+            if(localStorage.getItem('loggedUser')) {
+                loadProfile();
+                showPage('profilePage');
+            } else {
+                showPage('regPage');
+            }
+        };
+
+        function showPage(id) {
+            ['regPage', 'loginPage', 'profilePage'].forEach(p => document.getElementById(p).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function handleRegister() {
+            let user = {
+                name: document.getElementById('rName').value,
+                age: document.getElementById('rAge').value,
+                pin: document.getElementById('rPin').value,
+                phone: document.getElementById('rPhone').value,
+                email: document.getElementById('rEmail').value,
+                addr: document.getElementById('rAddr').value,
+                pass: document.getElementById('rPass').value
+            };
+            
+            if(user.pass !== document.getElementById('rConfirm').value) return alert("Passwords mismatch");
+            if(!user.email || !user.pass) return alert("Fill required fields");
+
+            localStorage.setItem(user.email, JSON.stringify(user));
+            alert("Account Created!");
+            showPage('loginPage');
+        }
+
+        function handleLogin() {
+            let email = document.getElementById('lEmail').value;
+            let pass = document.getElementById('lPass').value;
+            let data = JSON.parse(localStorage.getItem(email));
+
+            if(data && data.pass === pass) {
+                localStorage.setItem('loggedUser', email);
+                loadProfile();
+                showPage('profilePage');
+            } else alert("Invalid credentials");
+        }
+
+        function loadProfile() {
+            let email = localStorage.getItem('loggedUser');
+            let user = JSON.parse(localStorage.getItem(email));
+            document.getElementById('pName').value = user.name;
+            document.getElementById('pAge').value = user.age;
+            document.getElementById('pPin').value = user.pin;
+            document.getElementById('pPhone').value = user.phone;
+            document.getElementById('pAddr').value = user.addr;
+        }
+
+        function toggleEdit(isEditing) {
+            const inputs = document.querySelectorAll('#profileFields input, #profileFields textarea');
+            inputs.forEach(i => i.disabled = !isEditing);
+            document.getElementById('editBtn').classList.toggle('hidden', isEditing);
+            document.getElementById('saveBtn').classList.toggle('hidden', !isEditing);
+        }
+
+        function saveData() {
+            let email = localStorage.getItem('loggedUser');
+            let user = JSON.parse(localStorage.getItem(email));
+            
+            user.name = document.getElementById('pName').value;
+            user.age = document.getElementById('pAge').value;
+            user.pin = document.getElementById('pPin').value;
+            user.phone = document.getElementById('pPhone').value;
+            user.addr = document.getElementById('pAddr').value;
+
+            localStorage.setItem(email, JSON.stringify(user));
+            alert("Profile Updated!");
+            toggleEdit(false);
+        }
+
+        function openModal() { document.getElementById('passModal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('passModal').style.display = 'none'; }
+
+        function submitPassword() {
+            if(!document.getElementById('mCheck').checked) return alert("Please confirm the checkbox");
+            let p1 = document.getElementById('mPass').value;
+            let p2 = document.getElementById('mConfirm').value;
+            if(p1 !== p2 || !p1) return alert("Passwords must match");
+
+            let email = localStorage.getItem('loggedUser');
+            let user = JSON.parse(localStorage.getItem(email));
+            user.pass = p1;
+            localStorage.setItem(email, JSON.stringify(user));
+            alert("Password Changed!");
+            closeModal();
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedUser');
+            location.reload();
+        }
+    </script>
+</body>
+</html>

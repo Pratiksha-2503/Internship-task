@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple  App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        body {
+            background-color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h2 { 
+            text-align: center; 
+            font-size: 28px; 
+            color: #2563eb; 
+            margin-bottom: 30px; 
+            font-weight: 700;
+        }
+
+        .input-box { margin-bottom: 15px; }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #1a273c; 
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #3b82f6;
+            cursor: pointer;
+            display: block;
+        }
+
+        .hidden { display: none; }
+
+        .profile-row {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="regPage">
+            <h2>Create Account</h2>
+            
+            <div class="input-box"><label>Full Name</label><input type="text" id="nameInput"></div>
+            
+            <div style="display: flex; gap: 15px;">
+                <div class="input-box" style="flex:1"><label>Age</label><input type="number" id="ageInput"></div>
+                <div class="input-box" style="flex:1"><label>Pincode</label><input type="number" id="pinInput"></div>
+            </div>
+
+            <div class="input-box"><label>Phone Number</label><input type="text" id="phoneInput"></div>
+            <div class="input-box"><label>Email Address</label><input type="email" id="emailInput"></div>
+            <div class="input-box"><label>Address</label><textarea id="addrInput" rows="3"></textarea></div>
+            <div class="input-box"><label>Password</label><input type="password" id="passInput"></div>
+            <div class="input-box"><label>Confirm Password</label><input type="password" id="confirmInput"></div>
+
+            <button class="btn" onclick="saveData()">Sign Up</button>
+            <div class="link" onclick="show('loginPage')">Already registered? Login</div>
+        </div>
+
+        <div id="loginPage" class="hidden">
+            <h2>Login</h2>
+            <div class="input-box"><label>Email</label><input type="text" id="lEmail"></div>
+            <div class="input-box"><label>Password</label><input type="password" id="lPass"></div>
+            <button class="btn" onclick="checkLogin()">Login</button>
+            <div class="link" onclick="show('regPage')">New user? Register</div>
+        </div>
+
+        <div id="profilePage" class="hidden">
+            <h2>User Profile</h2>
+            <div id="displayArea"></div>
+            <button class="btn" onclick="logout()" style="background-color: #ef4444;">Logout</button>
+        </div>
+
+    </div>
+
+    <script>
+       
+
+        function show(id) {
+            document.getElementById('regPage').classList.add('hidden');
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('profilePage').classList.add('hidden');
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function saveData() {
+            var n = document.getElementById('nameInput').value;
+            var e = document.getElementById('emailInput').value;
+            var p = document.getElementById('phoneInput').value;
+            var pass1 = document.getElementById('passInput').value;
+            var pass2 = document.getElementById('confirmInput').value;
+
+            if (n == "" || e == "" || pass1 == "") {
+                alert("Please fill name, email and password");
+                return;
+            }
+            if (pass1 != pass2) {
+                alert("Passwords do not match");
+                return;
+            }
+            if (p.length != 10) {
+                alert("Phone must be 10 digits");
+                return;
+            }
+
+            var user = { name: n, email: e, phone: p, password: pass1 };
+            localStorage.setItem(e, JSON.stringify(user));
+            
+            alert("Account Created!");
+            show('loginPage');
+        }
+
+        function checkLogin() {
+            var e = document.getElementById('lEmail').value;
+            var p = document.getElementById('lPass').value;
+            var data = localStorage.getItem(e);
+
+            if (data) {
+                var user = JSON.parse(data);
+                if (user.password == p) {
+                    localStorage.setItem('loggedUser', e);
+                    viewProfile();
+                } else {
+                    alert("Wrong Password");
+                }
+            } else {
+                alert("User not found");
+            }
+        }
+
+        function viewProfile() {
+            var e = localStorage.getItem('loggedUser');
+            var user = JSON.parse(localStorage.getItem(e));
+
+            document.getElementById('displayArea').innerHTML = `
+                <div class="profile-row"><label>Name</label><b>${user.name}</b></div>
+                <div class="profile-row"><label>Email</label><b>${user.email}</b></div>
+                <div class="profile-row"><label>Phone</label><b>${user.phone}</b></div>
+            `;
+            show('profilePage');
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedUser');
+            show('loginPage');
+        }
+    </script>
+</body>
+</html>
